@@ -3,6 +3,14 @@ import { useState } from "react";
 const Button = (props) => <button onClick={props.onClick}>{props.text}</button>;
 
 const Statistics = (props) => {
+  if (props.all === 0) {
+    return (
+      <>
+        <h2>statistics</h2>
+        <p>No feedback given</p>
+      </>
+    )
+  }
   return (
     <>
       <h2>statistics</h2>
