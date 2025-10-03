@@ -14,6 +14,7 @@ const App = () => {
 
     const [selected, setSelected] = useState(0);
     const [votes, setVotes] = useState(new Uint8Array(anecdotes.length))
+    const [mostVote, setMostVote] = useState("");
 
     const generateRandomQuote = () => {
         const min = 0;
@@ -27,6 +28,14 @@ const App = () => {
         const votesCopy = [...votes];
         votesCopy[selected] += 1;
         setVotes(votesCopy);
+        pickMostVotes(votesCopy);
+    }
+
+    const pickMostVotes = (votes) => {
+        const max = Math.max(...votes);
+        const index = votes.indexOf(max);
+        const mostVotedQuote = anecdotes[index]; 
+        setMostVote(mostVotedQuote);
     }
 
     return (
@@ -36,6 +45,9 @@ const App = () => {
             <p>has {votes[selected]} votes</p>
             <button onClick={giveVote}>vote</button>
             <button onClick={generateRandomQuote}>next anecdote</button>
+            <h2>Anecdote with most votes</h2>
+            <p>{mostVote}</p>
+            <p>has {votes[anecdotes.indexOf(mostVote)]} votes</p>
         </div>
     )
 }
