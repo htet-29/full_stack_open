@@ -24,30 +24,41 @@ const App = () => {
 
     const addName = (event) => {
         event.preventDefault();
-        const newPerson = {
-            name: newName,
-            number: phNumber,
-            id: String(persons.length + 1),
-        };
+        
+        // const isTaken = persons.some((person) => person.name === newPerson.name);
+        const person = persons.find(p => p.name === newName);
+        if (person) {
+            if (window.confirm(`${person.name} is already added to phonebook, replace the old number with a new one?`)) {
+                const updatePerson = {...person, number: phNumber};
+                phoneBookService
+                    .update(person.id, updatePerson)
+                    .then(returnPerson => {
+                        setPersons(persons.map(p => p.id === returnPerson.id ? returnPerson : p));
+                        setNewName("");
+                        setPhNumber("");
+                    })
+            }
+        } else {
+            const newPerson = {
+                name: newName,
+                number: phNumber,
+                id: String(persons.length + 1)
+            }
 
-        const isTaken = persons.some((person) => person.name === newPerson.name);
-        if (isTaken) {
-            alert(`${newPerson.name} is already added to phonebook`);
-            return;
+            phoneBookService
+                .create(newPerson)
+                .then(returnPerson => {
+                    setPersons(persons.concat(returnPerson));
+                    setNewName("");
+                    setPhNumber("");
+                })
         }
         
-        phoneBookService
-            .create(newPerson)
-            .then(returnPerson => {
-                setPersons(persons.concat(returnPerson));
-                setNewName("");
-                setPhNumber("");
-            })
     };
 
     const handleDeleteOf = (id) => {
         const person = persons.find(p => p.id === id);
-        
+
         if (window.confirm(`Delete ${person.name}?`)) {
             phoneBookService.deletePerson(id)
             setPersons(persons.filter(p => p.id !== id));
