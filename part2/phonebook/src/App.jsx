@@ -40,20 +40,25 @@ const App = () => {
 
     const addName = (event) => {
         event.preventDefault();
-        const nameObj = {
+        const newPerson = {
             name: newName,
             number: phNumber,
             id: persons.length + 1,
         };
 
-        const isTaken = persons.some((person) => person.name === nameObj.name);
+        const isTaken = persons.some((person) => person.name === newPerson.name);
         if (isTaken) {
-            alert(`${nameObj.name} is already added to phonebook`);
+            alert(`${newPerson.name} is already added to phonebook`);
             return;
         }
-        setPersons(persons.concat(nameObj));
-        setNewName("");
-        setPhNumber("");
+        
+        axios
+            .post('http://localhost:3001/persons', newPerson)
+            .then(response => {
+                setPersons(persons.concat(response.data));
+                setNewName("");
+                setPhNumber("");
+            })
     };
 
     return (
