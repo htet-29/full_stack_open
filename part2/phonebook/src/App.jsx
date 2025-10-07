@@ -11,6 +11,7 @@ const App = () => {
     const [phNumber, setPhNumber] = useState('');
     const [filterWord, setFilterWord] = useState("");
     const [notiMessage, setNotiMessage] = useState(null);
+    const [isError, setIsError] = useState(false);
 
     const hook = () => {
         phoneBookService
@@ -38,9 +39,16 @@ const App = () => {
                     .update(person.id, updatePerson)
                     .then(returnPerson => {
                         setPersons(persons.map(p => p.id === returnPerson.id ? returnPerson : p));
-                        showNotification(`Updated ${updatePerson.name}'s phone number`);
+                        showNotification(`Updated ${updatePerson.name}'s phone number`, false);
                         setNewName("");
                         setPhNumber("");
+                    })
+                    .catch(error => {
+                        showNotification(
+                            `Information of ${updatePerson.name} has already been removed from the server`,
+                            true
+                        );
+                        setPersons(persons.filter(p => p.id !== person.id));
                     })
             }
         } else {
@@ -54,7 +62,7 @@ const App = () => {
                 .create(newPerson)
                 .then(returnPerson => {
                     setPersons(persons.concat(returnPerson));
-                    showNotification(`Added ${newPerson.name}`);
+                    showNotification(`Added ${newPerson.name}`, false);
                     setNewName("");
                     setPhNumber("");
                 })
@@ -69,7 +77,7 @@ const App = () => {
             phoneBookService.deletePerson(id)
             setPersons(persons.filter(p => p.id !== id));
         }
-    }
+    };
 
     const handleNameChange = (event) => {
         setNewName(event.target.value);
@@ -83,7 +91,8 @@ const App = () => {
         setFilterWord(event.target.value);
     }
 
-    function showNotification(message) {
+    function showNotification(message, _isError) {
+        setIsError(_isError);
         setNotiMessage(message);
         setTimeout(() => {
             setNotiMessage(null);
@@ -92,7 +101,7 @@ const App = () => {
     return (
         <div>
             <h2>Phonebook</h2>
-            <Notification message={notiMessage} />
+            <Notification message={notiMessage} isError={isError} />
             <Filter filterWord={filterWord} handleFilterChange={handleFilterChange} />
             <h2>Add a new</h2>
             <PersonForm addName={addName} handleNameChange={handleNameChange} newName={newName}
