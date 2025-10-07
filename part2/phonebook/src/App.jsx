@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import phoneBookService from "./services/phoneBook";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
@@ -12,11 +12,11 @@ const App = () => {
     
     const hook = () => {
         console.log('effect');
-        axios
-            .get('http://localhost:3001/persons')
-            .then(response => {
+        phoneBookService
+            .getAll()
+            .then(initialPersons => {
                 console.log('promise fullfilled');
-                setPersons(response.data);
+                setPersons(initialPersons);
             });
     };
 
@@ -52,10 +52,10 @@ const App = () => {
             return;
         }
         
-        axios
-            .post('http://localhost:3001/persons', newPerson)
-            .then(response => {
-                setPersons(persons.concat(response.data));
+        phoneBookService
+            .create(newPerson)
+            .then(returnPerson => {
+                setPersons(persons.concat(returnPerson));
                 setNewName("");
                 setPhNumber("");
             })
