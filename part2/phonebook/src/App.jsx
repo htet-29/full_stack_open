@@ -11,39 +11,23 @@ const App = () => {
     const [filterWord, setFilterWord] = useState("");
     
     const hook = () => {
-        console.log('effect');
         phoneBookService
             .getAll()
             .then(initialPersons => {
-                console.log('promise fullfilled');
                 setPersons(initialPersons);
             });
     };
 
     useEffect(hook, []);
     
-    console.log('render', persons.length, 'persons');
-
     const filterPersons = persons.filter(person => person.name.toLowerCase().includes(filterWord));
-
-    const handleNameChange = (event) => {
-        setNewName(event.target.value);
-    };
-
-    const handleNumberChange = (event) => {
-        setPhNumber(event.target.value);
-    };
-    
-    const handleFilterChange = (event) => {
-        setFilterWord(event.target.value);
-    }
 
     const addName = (event) => {
         event.preventDefault();
         const newPerson = {
             name: newName,
             number: phNumber,
-            id: persons.length + 1,
+            id: String(persons.length + 1),
         };
 
         const isTaken = persons.some((person) => person.name === newPerson.name);
@@ -61,6 +45,27 @@ const App = () => {
             })
     };
 
+    const handleDeleteOf = (id) => {
+        const person = persons.find(p => p.id === id);
+        
+        if (window.confirm(`Delete ${person.name}?`)) {
+            phoneBookService.deletePerson(id)
+            setPersons(persons.filter(p => p.id !== id));
+        }
+    }
+
+    const handleNameChange = (event) => {
+        setNewName(event.target.value);
+    };
+
+    const handleNumberChange = (event) => {
+        setPhNumber(event.target.value);
+    };
+    
+    const handleFilterChange = (event) => {
+        setFilterWord(event.target.value);
+    }
+
     return (
         <div>
             <h2>Phonebook</h2>
@@ -70,7 +75,7 @@ const App = () => {
                 handleNumberChange={handleNumberChange} phNumber={phNumber}
             />
             <h2>Numbers</h2>
-            <Persons filterPersons={filterPersons}/>
+            <Persons filterPersons={filterPersons} handleDelete={handleDeleteOf}/>
         </div>
     );
 };
