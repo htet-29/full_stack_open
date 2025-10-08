@@ -5,13 +5,16 @@ import Countries from "./components/Countries";
 const App = () => {
     const [countries, setCountries] = useState(null);
     const [filterCountries, setFilterCountries] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const hook = () => {
+        setIsLoading(true);
         countryService 
             .getAll()
             .then(initialCountries => {
                 setCountries(initialCountries);
             })
+            .finally(() => setIsLoading(false));
     }
     
     useEffect(hook, []);
@@ -24,7 +27,7 @@ const App = () => {
 
     return (
         <div>
-            { !countries 
+            { isLoading  
                 ? <p>Loading...</p> 
                 : <>
                     <div>

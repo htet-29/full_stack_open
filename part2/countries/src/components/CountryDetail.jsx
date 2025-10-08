@@ -1,4 +1,22 @@
+import { useEffect, useState } from "react";
+import weatherService from "../services/weather";
+import Weather from "./Weather";
+
 const CountryDetail = ({country}) => {
+    const [weather, setWeather] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        setIsLoading(true);
+        weatherService
+            .getWeatherData(country.capital)
+            .then(weatherData => {
+                setWeather(weatherData);
+            })
+            .finally(() => setIsLoading(false));
+        
+    }, [])
+
     return (
         <div>
             <h2>{country.name.common}</h2>
@@ -13,6 +31,11 @@ const CountryDetail = ({country}) => {
                 </ul>
                 <img src={country.flags["png"]} alt={`flag of ${country.name.common}`} />
             </div>
+            {
+                isLoading && !weather
+                ? <p>Loading weather data...</p>
+                : <Weather weather={weather}/>
+            }
         </div>
     )
 }
