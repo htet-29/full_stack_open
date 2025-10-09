@@ -1,0 +1,16 @@
+{
+  "name": "phonebook",
+  "version": "1.0.0",
+  "description": "",
+  "license": "MIT",
+  "author": "Htet Hlaing Win",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --watch index.js",
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
