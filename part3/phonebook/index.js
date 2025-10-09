@@ -64,8 +64,23 @@ const generateId = () => {
     return String(id);
 }
 app.post('/api/persons', (request, response) => {
-    const person = request.body;
-    person.id = generateId();
+    const body = request.body;
+    
+    if (!body.name || !body.number) {
+        return response.status(400).json({ error: "missing name or number" })
+    }
+    const duplicatePerson = persons.find(p => p.name === body.name);
+    
+    if (duplicatePerson) {
+        console.log(`Duplicate Name found: ${duplicatePerson.name}`)
+        return response.status(400).json({ error: "name must be unique" })
+    }
+    
+    const person = {
+        "id": generateId(),
+        "name": body.name,
+        "number": body.number,
+    };
     
     persons = persons.concat(person);
     response.json(persons);
