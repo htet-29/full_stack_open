@@ -44,7 +44,7 @@ app.get('/api/persons', (request, response) => {
     response.json(persons);
 });
 
-app.get('/info', (request, response) => {
+app.get('/', (request, response) => {
     const time = new Date();
     const entries = persons.length;
     const content = `
@@ -100,7 +100,7 @@ app.post('/api/persons', (request, response) => {
     response.json(persons);
 })
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
     console.log(`Server is listening to http://localhost:${PORT}`);
 });
