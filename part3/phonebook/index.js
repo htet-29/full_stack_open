@@ -57,25 +57,38 @@ const generateId = () => {
     const id = Math.floor(Math.random() * (max - min + 1)) + min;
     return String(id);
 }
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const body = request.body;
     
     if (!body.name || !body.number) {
         return response.status(400).json({ error: "missing name or number" })
     }
-    // const duplicatePerson = persons.find(p => p.name === body.name);
     
-    // if (duplicatePerson) {
-    //     console.log(`Duplicate Name found: ${duplicatePerson.name}`)
-    //     return response.status(400).json({ error: "name must be unique" })
-    // }
-    
-    const person = new Person({
+    const person = new person({
         "name": body.name,
         "number": body.number,
     });
     
-    person.save().then(savePerson => response.json(savePerson));
+    person.save()
+        .then(saveperson => response.json(saveperson))
+        .catch(error => next(error));
+    
+})
+
+app.put('/api/persons/:id', (request, response, next) => {
+    const { name, number } = request.body;
+    Person.findById(request.params.id)
+        .then(person => {
+            if (!person) {
+                return response.status(404).end();
+            }
+
+            person.name = name;
+            person.number = number;
+            
+            return person.save().then(updatedPerson => response.json(updatedPerson));
+        })
+        .catch(error => next(error));
 })
 
 const errorHandler = (error, request, response, next) => {
