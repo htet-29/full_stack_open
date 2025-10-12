@@ -23,7 +23,7 @@ const App = () => {
 
     useEffect(hook, []);
 
-    const filterPersons = persons.filter(person => person.name.toLowerCase().includes(filterWord));
+    const filterPersons = persons.filter(person => person.name.toLowerCase().includes(filterWord.toLowerCase()));
 
     const addName = (event) => {
         event.preventDefault();
@@ -35,6 +35,7 @@ const App = () => {
                 `${person.name} is already added to phonebook, replace the old number with a new one?`
             )) {
                 const updatePerson = { ...person, number: phNumber };
+                console.log(updatePerson);
                 phoneBookService
                     .update(person.id, updatePerson)
                     .then(returnPerson => {
