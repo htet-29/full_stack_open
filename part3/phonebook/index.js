@@ -64,21 +64,19 @@ app.post('/api/persons', (request, response) => {
     if (!body.name || !body.number) {
         return response.status(400).json({ error: "missing name or number" })
     }
-    const duplicatePerson = persons.find(p => p.name === body.name);
+    // const duplicatePerson = persons.find(p => p.name === body.name);
     
-    if (duplicatePerson) {
-        console.log(`Duplicate Name found: ${duplicatePerson.name}`)
-        return response.status(400).json({ error: "name must be unique" })
-    }
+    // if (duplicatePerson) {
+    //     console.log(`Duplicate Name found: ${duplicatePerson.name}`)
+    //     return response.status(400).json({ error: "name must be unique" })
+    // }
     
-    const person = {
-        "id": generateId(),
+    const person = new Person({
         "name": body.name,
         "number": body.number,
-    };
+    });
     
-    persons = persons.concat(person);
-    response.json(persons);
+    person.save().then(savePerson => response.json(savePerson));
 })
 
 const PORT = process.env.PORT || 3001;
