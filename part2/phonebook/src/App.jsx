@@ -67,6 +67,9 @@ const App = () => {
                     setNewName("");
                     setPhNumber("");
                 })
+                .catch(error => {
+                    showNotification(error.response.data.error, true);
+                });
         }
 
     };
