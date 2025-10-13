@@ -46,10 +46,10 @@ const App = () => {
                     })
                     .catch(error => {
                         showNotification(
-                            `Information of ${updatePerson.name} has already been removed from the server`,
+                            error.response.data.error,
                             true
                         );
-                        setPersons(persons.filter(p => p.id !== person.id));
+                        // setPersons(persons.filter(p => p.id !== person.id));
                     })
             }
         } else {
