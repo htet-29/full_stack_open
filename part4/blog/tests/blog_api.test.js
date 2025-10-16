@@ -1,4 +1,4 @@
-const { test, beforeEach, afterEach } = require('node:test')
+const { test, beforeEach, after } = require('node:test')
 const assert = require('node:assert')
 const supertest = require('supertest')
 const mongoose = require('mongoose')
@@ -25,6 +25,15 @@ test('All blogs are return as same amount with json format', async () => {
     assert.strictEqual(response.body.length, helper.initialBlogs.length)
 })
 
-afterEach(async () => {
+test('Verfiy unique identifier property is named id', async () => {
+    const response = await api.get('/api/blogs')
+    const blogs = response.body
+    blogs.forEach(blog => {
+        assert.ok(blog.id)
+        assert.strictEqual(blog._id, undefined)
+    })
+})
+
+after(async () => {
     await mongoose.connection.close()
 })
