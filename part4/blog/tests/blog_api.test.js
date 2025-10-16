@@ -55,6 +55,23 @@ test('A valid blog can be added', async () => {
     assert(contents.includes('React Master'))
 })
 
+test('Values of likes property is default to 0', async () => {
+    const newBlog = {
+        title: "React Master",
+        author: "Michael Jackson",
+        url: "https://reactmaster.com/"
+    }
+    
+    const response = await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+    const createdBlog = response.body
+    assert.strictEqual(createdBlog.likes, 0)
+})
+
 after(async () => {
     await mongoose.connection.close()
 })
