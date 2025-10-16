@@ -55,7 +55,7 @@ test('A valid blog can be added', async () => {
     assert(contents.includes('React Master'))
 })
 
-test('Values of likes property is default to 0', async () => {
+test('POST request without likes property defaults likes to 0', async () => {
     const newBlog = {
         title: "React Master",
         author: "Michael Jackson",
@@ -70,6 +70,34 @@ test('Values of likes property is default to 0', async () => {
 
     const createdBlog = response.body
     assert.strictEqual(createdBlog.likes, 0)
+})
+
+test('POST request without title property returns 400 Bad Request', async () => {
+    const invalidBlog = {
+        author: "Invalid Test",
+        url: "http://testurl.com/notitle",
+        likes: 1
+        // title is missing
+    }
+
+    await api  
+        .post('/api/blogs')
+        .send(invalidBlog)
+        .expect(400)
+})
+
+test('POST request without url property returns 400 Bad Request', async () => {
+    const invalidBlog = {
+        title: "No URL",
+        author: "Invalid Test",
+        likes: 1
+        // url is missing
+    }
+
+    await api  
+        .post('/api/blogs')
+        .send(invalidBlog)
+        .expect(400)
 })
 
 after(async () => {
