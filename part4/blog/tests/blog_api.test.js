@@ -34,6 +34,27 @@ test('Verfiy unique identifier property is named id', async () => {
     })
 })
 
+test('A valid blog can be added', async () => {
+    const newBlog = {
+        title: "React Master",
+        author: "Michael Jackson",
+        url: "https://reactmaster.com/",
+        likes: 100,
+    }
+    
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+    
+    const blogsAtEnd = await helper.blogsInDB()
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)
+
+    const contents = blogsAtEnd.map(b => b.title)
+    assert(contents.includes('React Master'))
+})
+
 after(async () => {
     await mongoose.connection.close()
 })
