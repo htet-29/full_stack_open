@@ -45,11 +45,21 @@ describe('when there is initially some blogs saved', () => {
                 likes: 100,
             }
             
+            const rootUser = { username: 'root', password: 'root@12345'}
+            
+            const loginUser = await api
+                .post('/api/login')
+                .send(rootUser)
+                .expect(200)
+                .expect('Content-Type', /application\/json/)
+            
             await api
                 .post('/api/blogs')
                 .send(newBlog)
+                .set('authorization', `Bear ${loginUser.body.token}`)
                 .expect(201)
                 .expect('Content-Type', /application\/json/)
+            
             
             const blogsAtEnd = await helper.blogsInDB()
             assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)
@@ -64,10 +74,19 @@ describe('when there is initially some blogs saved', () => {
                 author: "Michael Jackson",
                 url: "https://reactmaster.com/"
             }
+
+            const rootUser = { username: 'root', password: 'root@12345'}
+            
+            const loginUser = await api
+                .post('/api/login')
+                .send(rootUser)
+                .expect(200)
+                .expect('Content-Type', /application\/json/)
             
             const response = await api
                 .post('/api/blogs')
                 .send(newBlog)
+                .set('authorization', `Bear ${loginUser.body.token}`)
                 .expect(201)
                 .expect('Content-Type', /application\/json/)
         
@@ -76,6 +95,26 @@ describe('when there is initially some blogs saved', () => {
             
             const blogsAtEnd = await helper.blogsInDB()
             assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)
+        })
+        
+        test('POST request without authentication token return 401 Unauthorized', async () => {
+            const blogsAtStart = await helper.blogsInDB()
+
+            const newBlog = {
+                title: "React Master",
+                author: "Michael Jackson",
+                url: "https://reactmaster.com/"
+            }
+            
+            await api
+                .post('/api/blogs')
+                .send(newBlog)
+                .set('authorization', null)
+                .expect(401)
+                .expect('Content-Type', /application\/json/)
+            
+            const blogsAtEnd = await helper.blogsInDB()
+            assert.strictEqual(blogsAtEnd.length, blogsAtStart.length)
         })
         
         test('POST request without title property returns 400 Bad Request', async () => {
@@ -115,15 +154,36 @@ describe('when there is initially some blogs saved', () => {
     
     describe('deletion of a blog', () => {
         test('Delete request with valid id returns 204 status code', async () => {
-            const blogsAtStart = await helper.blogsInDB()
-            const blogToDelete = blogsAtStart[0]
-            await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
+            const newBlog = {
+                title: "React Master",
+                author: "Michael Jackson",
+                url: "https://reactmaster.com/",
+                likes: 100,
+            }
+            
+            const rootUser = { username: 'root', password: 'root@12345'}
+            
+            const loginUser = await api
+                .post('/api/login')
+                .send(rootUser)
+            
+            const result = await api
+                .post('/api/blogs')
+                .send(newBlog)
+                .set('authorization', `Bear ${loginUser.body.token}`)
+            
+            const blogToDelete = result.body
+
+            await api
+                .delete(`/api/blogs/${blogToDelete.id}`)
+                .set('authorization', `Bear ${loginUser.body.token}`)
+                .expect(204)
             
             const blogsAtEnd = await helper.blogsInDB()
             const tiltes = blogsAtEnd.map(b => b.title)
             assert(!tiltes.includes(blogToDelete.title))
             
-            assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
+            assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
         })
     })
         
