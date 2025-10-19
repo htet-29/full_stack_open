@@ -2,6 +2,7 @@ const blogRouter = require('express').Router()
 const jwt = require('jsonwebtoken')
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const { userExtractor } = require('../utils/middleware')
 
 blogRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', { username: 1, name: 1})
@@ -11,18 +12,8 @@ blogRouter.get('/', async (request, response) => {
 
 blogRouter.post('/', async (request, response) => {
   const body = request.body
+  const user = request.user
   
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
-  if (!decodedToken) {
-    return response.status(401).json({ error: 'token invalid' })
-  } 
-
-  const user = await User.findById(decodedToken.id)
-  
-  if (!user) {
-    return response.status(400).json(({ error: 'userId missing or not valid' }))
-  }
-
   if (!body.title || !body.url) {
     response.status(400).json({ error: 'Missing required field (title or url)'})
   }
@@ -43,16 +34,7 @@ blogRouter.post('/', async (request, response) => {
 })
 
 blogRouter.delete('/:id', async (request, response) => {
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
-  if (!decodedToken) {
-    return response.status(401).json({ error: 'token invalid' })
-  }
-  
-  const user = await User.findById(decodedToken.id)
-   
-  if (!user) {
-    return response.status(400).json({ error: 'userId missing or not valid' })
-  }
+  const user = request.user
   
   const blog = await Blog.findById(request.params.id)
   

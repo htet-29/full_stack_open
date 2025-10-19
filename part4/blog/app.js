@@ -6,6 +6,7 @@ const userRouter = require('./controllers/user')
 const loginRouter = require('./controllers/login')
 const logger = require('./utils/logger')
 const middleware = require('./utils/middleware')
+const { asyncHandler } = require('./utils/wrapper')
 
 const app = express()
 
@@ -23,6 +24,7 @@ mongoose
 app.use(express.json())
 app.use(middleware.requestLogger)
 app.use(middleware.tokenExtractor)
+app.use(asyncHandler(middleware.userExtractor))
 
 app.use('/api/blogs', blogRouter)
 app.use('/api/users', userRouter)
